@@ -1,3 +1,4 @@
+import GameBoard from "./components/Gameboard"
 import Player from "./components/Player"
 
 function App() {
@@ -12,8 +13,8 @@ function App() {
           {/* If the state in this first player component instance here changes, the second player component instance does not care about that at all. */}
           <Player initialName="Player 1" symbol="X" />
           <Player initialName="Player 2" symbol="O" />
-
         </ol>
+        <GameBoard />
       </div>
     </main>
   )
