@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function Player({ initialName, symbol, isActive }) {
   // We can have multiple useState to handle multiple states
@@ -21,7 +21,7 @@ export default function Player({ initialName, symbol, isActive }) {
   }
 
   let editablePlayerName = <span className="player-name">{playerName}</span>;
-  let btnCaption = "Edit";
+  let btnCaption = 'Edit';
 
   if (isEditing) {
     editablePlayerName = (
@@ -32,11 +32,11 @@ export default function Player({ initialName, symbol, isActive }) {
         onChange={handleChange}
       ></input>
     );
-    btnCaption = "Save";
+    btnCaption = 'Save';
   }
 
   return (
-    <li className={isActive ? "active" : undefined}>
+    <li className={isActive ? 'active' : undefined}>
       <span className="player">
         {editablePlayerName}
         <span className="player-symbol">{symbol}</span>
