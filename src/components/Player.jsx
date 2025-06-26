@@ -1,9 +1,14 @@
 import { useState } from 'react';
 
-export default function Player({ initialName, symbol, isActive }) {
+export default function Player({
+  initialName,
+  symbol,
+  isActive,
+  onChangeName,
+}) {
   // We can have multiple useState to handle multiple states
-  const [isEditing, setIsEditing] = useState(false);
   const [playerName, setPlayerName] = useState(initialName);
+  const [isEditing, setIsEditing] = useState(false);
 
   function handleEditClick() {
     // unnecessary logic
@@ -14,6 +19,9 @@ export default function Player({ initialName, symbol, isActive }) {
     // Because this function which you pass here will be called by React and it will automatically get the current state value. So the value before this state update here as an input.
     // But what is wrong with setIsEditing(!isEditing) : React schedule state update
     setIsEditing((editing) => !editing);
+    if (isEditing) {
+      onChangeName(symbol, playerName);
+    }
   }
 
   function handleChange(event) {

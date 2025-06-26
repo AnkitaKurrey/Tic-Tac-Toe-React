@@ -3,12 +3,18 @@ import Player from './components/Player';
 import Log from './components/Log';
 import { useState } from 'react';
 import { WINNING_COMBINATIONS } from './winning_combinations';
+import GameOver from './components/GameOver';
 
-const initialGameBoard = [
+const INITIAL_GAME_BOARD = [
   [null, null, null],
   [null, null, null],
   [null, null, null],
 ];
+
+const PLAYERS = {
+  X: 'Player 1',
+  O: 'Player 2',
+};
 
 function dervivedActivePlayer(gameTurns) {
   let currentPlayer = 'X';
@@ -18,12 +24,31 @@ function dervivedActivePlayer(gameTurns) {
   return currentPlayer;
 }
 
-function App() {
-  const [gameTurns, setGameTurns] = useState([]);
-  // const [activeplayer, setActivePlayer] = useState("X");
+function deriveWinner(gameBoard, players) {
+  let winner;
 
-  const activePlayer = dervivedActivePlayer(gameTurns);
-    let gameBoard = initialGameBoard;
+  for (const combination of WINNING_COMBINATIONS) {
+    const firstSqaureSymbol =
+      gameBoard[combination[0].row][combination[0].column];
+    const secondSqaureSymbol =
+      gameBoard[combination[1].row][combination[1].column];
+    const thirdSqaureSymbol =
+      gameBoard[combination[2].row][combination[2].column];
+
+    if (
+      firstSqaureSymbol &&
+      firstSqaureSymbol === secondSqaureSymbol &&
+      firstSqaureSymbol === thirdSqaureSymbol
+    ) {
+      winner = players[firstSqaureSymbol];
+    }
+  }
+
+  return winner;
+}
+
+function deriveGameBoard(gameTurns) {
+  let gameBoard = [...INITIAL_GAME_BOARD.map((array) => [...array])];
 
   for (const turn of gameTurns) {
     const { square, player } = turn;
@@ -31,11 +56,18 @@ function App() {
     gameBoard[row][col] = player;
   }
 
-  for (const combination of WINNING_COMBINATIONS){
-    const firstSqaureSymbol = gameBoard[combination[0].row][combination[0].column]
-    const secondSqaureSymbol = gameBoard[combination[1].row][combination[1].column]
-    const thirdSqaureSymbol = gameBoard[combination[2].row][combination[2].column]
-  }
+  return gameBoard;
+}
+function App() {
+  const [gameTurns, setGameTurns] = useState([]);
+  const [players, setPlayers] = useState(PLAYERS);
+
+  const activePlayer = dervivedActivePlayer(gameTurns);
+
+  const gameBoard = deriveGameBoard(gameTurns);
+
+  const winner = deriveWinner(gameBoard, players);
+  const hasDraw = gameTurns.length === 9 && !winner;
 
   function handleSelectSquare(rowIndex, colIndex) {
     // setActivePlayer((curActivePlayer) => (curActivePlayer === "X" ? "O" : "X"));
@@ -49,6 +81,19 @@ function App() {
       return updatedTurns;
     });
   }
+
+  function handleRestart() {
+    setGameTurns([]);
+  }
+
+  function handlePlayerNameChange(symbol, newName) {
+    setPlayers((prevPlayers) => {
+      return {
+        ...prevPlayers,
+        [symbol]: newName,
+      };
+    });
+  }
   return (
     <main>
       <div id="game-container">
@@ -57,16 +102,21 @@ function App() {
           {/* So even though both players use the same player component, they work totally isolated from each other. */}
           {/* If the state in this first player component instance here changes, the second player component instance does not care about that at all. */}
           <Player
-            initialName="Player 1"
+            initialName={PLAYERS.X}
             symbol="X"
             isActive={activePlayer === 'X'}
+            onChangeName={handlePlayerNameChange}
           />
           <Player
-            initialName="Player 2"
+            initialName={PLAYERS.O}
             symbol="O"
             isActive={activePlayer === 'O'}
+            onChangeName={handlePlayerNameChange}
           />
         </ol>
+        {(winner || hasDraw) && (
+          <GameOver winner={winner} onRestart={handleRestart} />
+        )}
         <GameBoard onSelectSquare={handleSelectSquare} board={gameBoard} />
       </div>
       <Log turns={gameTurns} />
